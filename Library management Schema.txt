@@ -1,0 +1,85 @@
+mysql> create database LIBRARY;
+Query OK, 1 row affected (0.03 sec)
+
+mysql> use LIBRARY;
+Database changed
+
+mysql> CREATE TABLE Users (
+    ->     user_id INT AUTO_INCREMENT PRIMARY KEY,
+    ->     name VARCHAR(100) NOT NULL,
+    ->     email VARCHAR(100) UNIQUE NOT NULL,
+    ->     phone VARCHAR(15),
+    ->     address TEXT,
+    ->     user_type ENUM('member', 'librarian', 'admin') NOT NULL,
+    ->     date_joined DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Use CURRENT_TIMESTAMP
+    ->     status ENUM('active', 'inactive') NOT NULL DEFAULT 'active'
+    -> );
+Query OK, 0 rows affected (0.12 sec)
+
+mysql> DESC Users;
++-------------+------------------------------------+------+-----+-------------------+-------------------+
+| Field       | Type                               | Null | Key | Default           | Extra             |
++-------------+------------------------------------+------+-----+-------------------+-------------------+
+| user_id     | int                                | NO   | PRI | NULL              | auto_increment    |
+| name        | varchar(100)                       | NO   |     | NULL              |                   |
+| email       | varchar(100)                       | NO   | UNI | NULL              |                   |
+| phone       | varchar(15)                        | YES  |     | NULL              |                   |
+| address     | text                               | YES  |     | NULL              |                   |
+| user_type   | enum('member','librarian','admin') | NO   |     | NULL              |                   |
+| date_joined | datetime                           | NO   |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
+| status      | enum('active','inactive')          | NO   |     | active            |                   |
++-------------+------------------------------------+------+-----+-------------------+-------------------+
+8 rows in set (0.03 sec)
+
+mysql> CREATE TABLE Books (    book_id INT AUTO_INCREMENT PRIMARY KEY,    title VARCHAR(200) NOT NULL,    author VARCHAR(150) NOT NULL,    publisher VARCHAR(100),    isbn VARCHAR(20) UNIQUE,    edition VARCHAR(50),    category VARCHAR(50),    language VARCHAR(50),    publication_year YEAR,    total_copies INT NOT NULL,    available_copies INT NOT NULL,    shelf_location VARCHAR(50));
+Query OK, 0 rows affected (0.08 sec)
+
+mysql> DESC Books;
++------------------+--------------+------+-----+---------+----------------+
+| Field            | Type         | Null | Key | Default | Extra          |
++------------------+--------------+------+-----+---------+----------------+
+| book_id          | int          | NO   | PRI | NULL    | auto_increment |
+| title            | varchar(200) | NO   |     | NULL    |                |
+| author           | varchar(150) | NO   |     | NULL    |                |
+| publisher        | varchar(100) | YES  |     | NULL    |                |
+| isbn             | varchar(20)  | YES  | UNI | NULL    |                |
+| edition          | varchar(50)  | YES  |     | NULL    |                |
+| category         | varchar(50)  | YES  |     | NULL    |                |
+| language         | varchar(50)  | YES  |     | NULL    |                |
+| publication_year | year         | YES  |     | NULL    |                |
+| total_copies     | int          | NO   |     | NULL    |                |
+| available_copies | int          | NO   |     | NULL    |                |
+| shelf_location   | varchar(50)  | YES  |     | NULL    |                |
++------------------+--------------+------+-----+---------+----------------+
+12 rows in set (0.00 sec)
+
+mysql> CREATE TABLE Transactions (    transaction_id INT AUTO_INCREMENT PRIMARY KEY,    user_id INT NOT NULL,    book_id INT NOT NULL,    issue_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,    due_date DATETIME NOT NULL,    return_date DATETIME,    status ENUM('issued', 'returned', 'overdue') NOT NULL DEFAULT 'issued',    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,    FOREIGN KEY (book_id) REFERENCES Books(book_id) ON DELETE CASCADE);
+Query OK, 0 rows affected (0.10 sec)
+
+mysql> DESC Transactions;
++----------------+-------------------------------------+------+-----+-------------------+-------------------+
+| Field          | Type                                | Null | Key | Default           | Extra             |
++----------------+-------------------------------------+------+-----+-------------------+-------------------+
+| transaction_id | int                                 | NO   | PRI | NULL              | auto_increment    |
+| user_id        | int                                 | NO   | MUL | NULL              |                   |
+| book_id        | int                                 | NO   | MUL | NULL              |                   |
+| issue_date     | datetime                            | NO   |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
+| due_date       | datetime                            | NO   |     | NULL              |                   |
+| return_date    | datetime                            | YES  |     | NULL              |                   |
+| status         | enum('issued','returned','overdue') | NO   |     | issued            |                   |
++----------------+-------------------------------------+------+-----+-------------------+-------------------+
+7 rows in set (0.00 sec)
+
+mysql> CREATE TABLE Logs (    log_id INT AUTO_INCREMENT PRIMARY KEY,    user_id INT,    action VARCHAR(255) NOT NULL,    timestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE SET NULL);
+Query OK, 0 rows affected (0.08 sec)
+
+mysql> DESC Logs;
++-----------+--------------+------+-----+-------------------+-------------------+
+| Field     | Type         | Null | Key | Default           | Extra             |
++-----------+--------------+------+-----+-------------------+-------------------+
+| log_id    | int          | NO   | PRI | NULL              | auto_increment    |
+| user_id   | int          | YES  | MUL | NULL              |                   |
+| action    | varchar(255) | NO   |     | NULL              |                   |
+| timestamp | datetime     | NO   |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
++-----------+--------------+------+-----+-------------------+-------------------+
+4 rows in set (0.00 sec)
